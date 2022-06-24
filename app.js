@@ -1,4 +1,3 @@
-
 /*
     현재 만들고 있는 파일을 main 파일 또는 main 어플리케이션이라고 한다.
     우리가 어떤 프로젝트를 만들 때 규모가 커지면 파일을 나누어야 하는데
@@ -10,13 +9,48 @@
 var express = require('express');
 var app = express();
 
+app.locals.pretty = true;
+
+/*
+    template 엔진을 express와 결합시킬 때
+    template 엔진의 구체적인 제품 jade를 설치하고, 밑의 설정을 해주었다.
+    그리고 res.render을 통해 화면에 보여주었다.
+    데이터를 주입하고싶을 땐 객체를 정의해서 프로퍼티값으로 넣어준다.
+    이러한 내용은 구글에 jade template engine으로 검색해면 된다.
+*/
+app.set('view engine', 'jade');
+app.set('views', './views');
+
 // 밑의 코드는 덩어리로 생각하자. public이라는 디렉토리를 정적인 파일이 위치하는 디렉토리로 하겠다.
 // 정적인 파일이 위치할 디렉토리를 지정하는 코드이며, 그 디렉토리는 public이다.
 // url의 뒤에다가 /karina.jpg만 쳐도 카리나 이미지를 읽어낸다. 
 app.use(express.static('public')); 
 
+app.get('/topic', function (req, res) {
+    var topics = ['javascript is...', 'node.js is...', 'express is...'];
+    var output = `
+        <a href="/topic?id=0">javascript</a><br>
+        <a href="/topic?id=1">node.js</a><br>
+        <a href="/topic?id=2">express</a><br><br>
+        ${topics[req.query.id]}
+    `
+    res.send(output);
+})
+
+/*
+    위의 코드처럼 /topic/id=? 이런식으로 접근하는 것이 아니라 /topic/? 이런식으로 접근하는 방식을 시멘틱 웹이라고 한다.
+*/
+
+app.get('/topic/:id/:mode', function (req, res) {
+    res.send(req.params.id + ', ' + req.params.mode);
+})
+
 app.get('/router', function (req, res) {
     res.send('Hello Router, <img src="/karina.jpg"/>')
+})
+
+app.get('/template', function (req,res) {
+    res.render('temp', {time:Date(), _title:'Jade'});    
 })
 
 /*
