@@ -89,6 +89,7 @@ app.get('/template', function (req,res) {
     사용자가 홈페이지로 접속했을 때 홈페이지에 접속했다라는걸 화면에 보여주고싶을 때 get함수 사용
     post 방식도 있고, 우리가 url을 통해 홈페이지에 접속하는 것은 get방식임. get방식으로 접속한 사용자를 받기 위해서는
     get함수를 사용해야함.
+    링크를 통해 들어가는 것은 get방식
 */
 app.get('/', function (req, res) {
     res.send('Hello homepage');
