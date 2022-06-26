@@ -7,6 +7,12 @@
     app.js는 express에서 권장하는 메인 어플리케이션 이름이다.
 */
 var express = require('express');
+
+// post로 사용자가 요청을 했을 때 request안에는 body라는 객체가 존재하지 않는다.
+// 밑의 코드를 추가하고 app.use(bodyParser.urlencoded({ extended: false })); 이 코드도 추가한다.
+// 이렇게되면 bodyParser가 body라는 객체를 추가해줌으로써 코드가 실행된다.
+// name의 값으로 들어온 데이터들을 body객체의 프로퍼티로 넣어준다.
+var bodyParser = require('body-parser');
 var app = express();
 
 app.locals.pretty = true;
@@ -25,6 +31,24 @@ app.set('views', './views');
 // 정적인 파일이 위치할 디렉토리를 지정하는 코드이며, 그 디렉토리는 public이다.
 // url의 뒤에다가 /karina.jpg만 쳐도 카리나 이미지를 읽어낸다. 
 app.use(express.static('public')); 
+app.use(bodyParser.urlencoded({ extended: false }));
+
+app.get('/form', function (req, res) {
+    res.render('form');
+})
+
+app.get('/form_receiver', function (req, res) {
+    res.send(req.query.title + ', ' +  req.query.description);
+})
+
+/*
+    url의 규정상 일정 길이가 넘어가면 데이터를 버린다. get방식의 경우 url에 내용들이 담겨있기 때문에 
+    대량의 데이터를 보낼 땐 get방식이 아니라 post 방식을 사용해야한다. 또한, post방식도 안전한건 아니지만
+    id와 pw와 같은 정보를 입력할 때도 get방식이 아니라 post방식으로 보낸다.
+*/
+app.post('/form_receiver', function (req, res) {
+    res.send(req.body.title + ", " + req.body.description);
+})
 
 app.get('/topic', function (req, res) {
     var topics = ['javascript is...', 'node.js is...', 'express is...'];
@@ -36,13 +60,21 @@ app.get('/topic', function (req, res) {
     `
     res.send(output);
 })
-
 /*
     위의 코드처럼 /topic/id=? 이런식으로 접근하는 것이 아니라 /topic/? 이런식으로 접근하는 방식을 시멘틱 웹이라고 한다.
 */
 
-app.get('/topic/:id/:mode', function (req, res) {
-    res.send(req.params.id + ', ' + req.params.mode);
+
+// parameter 접근 방식
+app.get('/topic/:id', function (req, res) {
+    var topics = ['javascript is...', 'node.js is...', 'express is...'];
+    var output = `
+        <a href="/topic/0">javascript</a><br>
+        <a href="/topic/1">node.js</a><br>
+        <a href="/topic/2">express</a><br><br>
+        ${topics[req.params.id]}
+    `
+    res.send(output);
 })
 
 app.get('/router', function (req, res) {
